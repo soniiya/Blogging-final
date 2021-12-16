@@ -1,6 +1,7 @@
 //jshint esversion:6
 require('dotenv').config()
 const express = require("express");
+const serverless = require("serverless-http");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
@@ -236,6 +237,7 @@ app.post("/login", function (req, res) {
     }
   })
 });
+
 
 // app.get("/success",function(req,res){
 //  if(req.isAuthenticate()){
