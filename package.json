@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node ./src/app.js"  
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:soniiya/Blogging-final.git"
+  },
   "author": "",
   "license": "ISC",
   "engines": {
