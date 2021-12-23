@@ -55,7 +55,13 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb+srv://admin-sonia:sonia26@cluster0.quojn.mongodb.net/blogDB", { useNewUrlParser: true });
+
+var url = process.env.MONGO_URI;
+const options = {
+  useNewUrlParser: true,
+  };
+
+mongoose.connect(url, options);
 //mongoose.set("useCreateIndex", true);
 
 const userSchema = new mongoose.Schema({
