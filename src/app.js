@@ -5,6 +5,7 @@ const serverless = require("serverless-http");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
+var MongoClient = require('mongodb').MongoClient;
 const multer = require('multer');
 const passport = require("passport");
 const session = require("express-session");
@@ -56,13 +57,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-var url = process.env.MONGO_URI;
+var uri = process.env.MONGO_URL;
 const options = {
   useNewUrlParser: true,
   };
-
-mongoose.connect(url, options);
+ mongoose.connect(uri, options);
 //mongoose.set("useCreateIndex", true);
+
+// MongoClient.connect(uri, function(err, client) {
+//   const collection = client.blogDB("blogDB").collection("posts,users");
+//   // perform actions on the collection object
+//   client.close();
+// });
 
 const userSchema = new mongoose.Schema({
   email: String,
