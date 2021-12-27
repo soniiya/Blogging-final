@@ -18,29 +18,6 @@ const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pelle
 const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 const profileContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
-// const { each } = require('lodash');
-// const { urlencoded } = require('body-parser');
-// const { request } = require('express');
-
-//define storage for images
-// const storage = multer.diskStorage({
-//   destination:function(request,file,callback){
-//     callback(null, './public/images')
-//   },
-// //addback the extension
-//   filename:function(request , file, calltime){
-//     callback(null, Date.now() + file.originalname)
-//   },
-// });
-//   //upload parameter for multer
-//   const uploadimg = multer({
-//     storage: storage,
-//     limits:{
-//       fieldSize: 1024*1024*3,
-//     }
-//   });
-//   module.exports = uploadimg
-
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -48,7 +25,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(session({
-  secret: process.env.CLIENT_SECRET,
+  secret: "success",
   resave: false,
   saveUninitialized: false
 }));
@@ -62,13 +39,6 @@ const options = {
   useNewUrlParser: true,
   };
  mongoose.connect(uri, options);
-//mongoose.set("useCreateIndex", true);
-
-// MongoClient.connect(uri, function(err, client) {
-//   const collection = client.blogDB("blogDB").collection("posts,users");
-//   // perform actions on the collection object
-//   client.close();
-// });
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -78,7 +48,7 @@ const userSchema = new mongoose.Schema({
 
 //const secret =  "secret";
 userSchema.plugin(passportLocalMongoose);
-userSchema.plugin(findOrCreate);
+//userSchema.plugin(findOrCreate);
 
 const User = new mongoose.model("User", userSchema);
 
@@ -94,18 +64,18 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/success",
-  userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
-},
-function(accessToken, refreshToken, profile, cb) {
-  User.findOrCreate({ googleId: profile.id }, function (err, user) {
-    return cb(err, user);
-  });
-}
-));
+// passport.use(new GoogleStrategy({
+//   clientID: process.env.CLIENT_ID,
+//   clientSecret: process.env.CLIENT_SECRET,
+//   callbackURL: "http://localhost:3000/auth/google/success",
+//   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+// },
+// function(accessToken, refreshToken, profile, cb) {
+//   User.findOrCreate({ googleId: profile.id }, function (err, user) {
+//     return cb(err, user);
+//   });
+// }
+// ));
 
 const postSchema = {
   title: String,
@@ -127,16 +97,16 @@ app.get("/", function (req, res) {
   });
 });
 
-app.get("/auth/google",
-   passport.authenticate("google", {scope: ["profile"]}) 
-);
+// app.get("/auth/google",
+//    passport.authenticate("google", {scope: ["profile"]}) 
+// );
 
-app.get('/auth/google/success', 
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect("/success");
-  });
+// app.get('/auth/google/success', 
+//   passport.authenticate('google', { failureRedirect: '/login' }),
+//   function(req, res) {
+//     // Successful authentication, redirect home.
+//     res.redirect("/success");
+//   });
 
 app.get("/profile", function (req, res) {
 
@@ -220,12 +190,13 @@ app.get("/success", function (req, res) {
 })
 
 app.post("/register", function (req, res) {
+
   User.register({ username: req.body.username },
     req.body.password, function (err, user) {
       if (err) {
         console.log(err);
-        res.redirect("/");
-      } else {
+        res.redirect("/register");
+} else {
         passport.authenticate("local")(req, res, function () {
           res.redirect("/success");
         });
@@ -250,51 +221,6 @@ app.post("/login", function (req, res) {
 });
 
 
-// app.get("/success",function(req,res){
-//  if(req.isAuthenticate()){
-//    res.render("success");
-//  }else{
-//    res.redirect("/login");
-//  }
-// });
-
-// app.get("/logout",function(req,res){
-//   req.logout();
-//   res.redirect("/");
-// });
-
-// app.post("/register",function(req,res){
-
-//   User.register({username: req.body.username}, req.body.password, function(err, user){
-//     if(err){
-//       console.log(err);
-//       res.redirect("/register");
-//     }else{
-//       passport.authenticate("local")(req,res,function(){
-//         res.redirect("/success");
-//       });
-//     }
-//   });
-//   });
-
-// app.post("/login",function(req,res){
-//  const user = new User({
-//   username: req.body.username,
-//   password: req.body.password
-// });
-
-//  req.login(user,function(err){
-//    if(err){
-//      console.log(err);
-//    }
-//    else{
-//      passport.authenticate("local") (req,res,function(){
-//        res.redirect("/success");
-//      });
-//   }
-//  });
-// });
-
-app.listen(process.env.PORT || 3000, function () {
+app.listen(process.env.PORT || 8000, function () {
   console.log("Server started on port 3000");
 });
